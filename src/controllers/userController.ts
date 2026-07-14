@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { User } from "../models/user";
 import bcrypt from "bcryptjs";
+import generateToken from "../utils/generateToken";
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -14,7 +15,8 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
     }
 
     const user = await User.create({ name, email, password });
-    res.status(201).json({ _id: user._id, name: user.name, email: user.email });
+    const token = generateToken(user._id);
+    res.status(201).json({ _id: user._id, name: user.name, email: user.email, token });
   } catch (error) {
     next(error); // This sends the error to your errorHandler.ts
   }
@@ -33,7 +35,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
         _id: user._id,
         name: user.name,
         email: user.email,
-        // You can add your JWT token generation here later
+        token: generateToken(user._id.toString()),
       });
     } else {
       res.status(401);
