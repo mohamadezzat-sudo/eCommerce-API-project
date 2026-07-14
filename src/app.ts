@@ -2,8 +2,8 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { connectDB } from "./db";
-import routes from "./routes";
-import { errorHandler } from "./middlewares/errorHandler";
+import { errorHandler } from "./middleware/errorHandler";
+import userRoutes from "./routes/userRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,7 +13,7 @@ app.use(express.json());
 
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
 
-app.use("/api", routes);
+app.use("/api/users", userRoutes);
 
 // Centralized error handler - must be registered last
 app.use(errorHandler);

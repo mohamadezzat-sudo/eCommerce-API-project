@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import generateToken from "../utils/generateToken";
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
+    console.log("DEBUG - Request Body:", req.body);
   try {
     const { name, email, password } = req.body;
     
@@ -15,7 +16,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
     }
 
     const user = await User.create({ name, email, password });
-    const token = generateToken(user._id);
+    const token = generateToken(user._id.toString());
     res.status(201).json({ _id: user._id, name: user.name, email: user.email, token });
   } catch (error) {
     next(error); // This sends the error to your errorHandler.ts
@@ -40,6 +41,27 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
     } else {
       res.status(401);
       throw new Error("Invalid email or password");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get user profile
+export const getUserProfile = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // Because you used the 'protect' middleware, 'req.user' is now available
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      });
+    } else {
+      res.status(404);
+      throw new Error("User not found");
     }
   } catch (error) {
     next(error);
