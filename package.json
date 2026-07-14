@@ -1,34 +1,30 @@
 {
-  "name": "ecommerce-api-project",
+  "name": "ecommerce-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "eCommerce API - Express + TypeScript + Mongoose",
+  "main": "dist/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mohamadezzat-sudo/eCommerce-API-project.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/mohamadezzat-sudo/eCommerce-API-project/issues"
-  },
-  "homepage": "https://github.com/mohamadezzat-sudo/eCommerce-API-project#readme",
   "dependencies": {
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "mongoose": "^9.7.4",
-    "zod": "^4.4.3"
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.4.1",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/express": "^5.0.6",
-    "@types/node": "^26.1.1",
-    "nodemon": "^3.1.14",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.2",
+    "@types/swagger-ui-express": "^4.1.6",
+    "nodemon": "^3.1.3",
     "ts-node": "^10.9.2",
-    "typescript": "^7.0.2"
+    "typescript": "^5.4.5"
   }
 }
