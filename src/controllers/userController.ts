@@ -1,24 +1,10 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/userModel';
 import bcrypt from 'bcryptjs';
 import generateToken from '../utils/generateToken';
+import { asyncHandler } from '../middleware/asyncHandler';
+import { AppError } from '../middleware/AppError';
 
-class AppError extends Error {
-  constructor(public message: string, public statusCode: number) {
-    super(message);
-    this.name = 'AppError';
-  }
-}
-
-type AsyncRequestHandler = (req: Request, res: Response, next?: any) => Promise<any>;
-
-const asyncHandler = (fn: AsyncRequestHandler) => (
-  req: Request,
-  res: Response,
-  next?: any
-) => {
-  Promise.resolve(fn(req, res, next)).catch(next);
-};
 
 // POST /api/users - Register user
 export const registerUser = asyncHandler(async (req: Request, res: Response) => {
@@ -37,9 +23,8 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
 
   if (user) {
     res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
+      success: true,
+      data: user,
       token: generateToken(user._id.toString()),
     });
   } else {

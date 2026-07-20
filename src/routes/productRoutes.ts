@@ -19,7 +19,7 @@ router.route('/')
 // Routes for /api/products/:id
 router.route('/:id')
   .get(getProductById)
-  .put(validate(productSchema), updateProduct) // Reusing productSchema for updates
+.put(validate(productSchema.partial()), updateProduct)
   .delete(deleteProduct);
 
 export default router;
