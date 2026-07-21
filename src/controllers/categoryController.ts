@@ -30,3 +30,64 @@ export const getAllCategories = asyncHandler(async (req: Request, res: Response,
     },
   });
 });
+
+// Get a single category by ID
+export const getCategoryById = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const category = await Category.findById(req.params.id);
+
+    if (!category) {
+        res.status(404).json({
+            status: 'fail',
+            message: 'No category found with that ID',
+        });
+        return;
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            category,
+        },
+    });
+});
+
+// Update a category
+export const updateCategory = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true,
+    });
+
+    if (!category) {
+        res.status(404).json({
+            status: 'fail',
+            message: 'No category found with that ID',
+        });
+        return;
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            category,
+        },
+    });
+});
+
+// Delete a category
+export const deleteCategory = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const category = await Category.findByIdAndDelete(req.params.id);
+
+    if (!category) {
+        res.status(404).json({
+            status: 'fail',
+            message: 'No category found with that ID',
+        });
+        return;
+    }
+
+    res.status(204).json({
+        status: 'success',
+        data: null,
+    });
+});

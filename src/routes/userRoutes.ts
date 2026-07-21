@@ -1,19 +1,27 @@
 import { Router } from "express";
-import { registerUser, loginUser, getUserProfile } from "../controllers/userController";
+import { 
+  registerUser, 
+  loginUser, 
+  getUserProfile, 
+  getUsers, 
+  deleteUser 
+} from "../controllers/userController";
 import { validate } from "../middleware/validate";
 import { createUsersSchema, loginUsersSchema } from "../models/userSchema";
 import { protect } from "../middleware/authMiddleware";
+import { admin } from "../middleware/adminMiddleware";
 
 const router = Router();
 
-// POST /api/users/register
+// Public routes
 router.post("/register", validate(createUsersSchema), registerUser);
+router.post("/login", validate(loginUsersSchema), loginUser);
 
-// GET /api/users/profile
+// Protected user routes
 router.get("/profile", protect, getUserProfile);
 
-// POST /api/users/login
-// Note: You will need to create a login function in your userController.ts
-router.post("/login", validate(loginUsersSchema), loginUser);
+// Admin-only user management routes
+router.get("/", protect, admin, getUsers);
+router.delete("/:id", protect, admin, deleteUser);
 
 export default router;
