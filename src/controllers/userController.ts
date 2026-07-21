@@ -1,26 +1,13 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/userModel';
 import bcrypt from 'bcryptjs';
 import generateToken from '../utils/generateToken';
+import { asyncHandler } from '../middleware/asyncHandler';
+import { AppError } from '../middleware/AppError';
 
-class AppError extends Error {
-  constructor(public message: string, public statusCode: number) {
-    super(message);
-    this.name = 'AppError';
-  }
-}
-
-type AsyncRequestHandler = (req: Request, res: Response, next?: any) => Promise<any>;
-
-const asyncHandler = (fn: AsyncRequestHandler) => (
-  req: Request,
-  res: Response,
-  next?: any
-) => {
-  Promise.resolve(fn(req, res, next)).catch(next);
-};
-
-// POST /api/users - Register user
+// @desc    Register user
+// @route   POST /api/users
+// @access  Public
 export const registerUser = asyncHandler(async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
 
@@ -37,9 +24,8 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
 
   if (user) {
     res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
+      success: true,
+      data: user,
       token: generateToken(user._id.toString()),
     });
   } else {
@@ -47,13 +33,14 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
   }
 });
 
-// POST /api/users/login - Authenticate user
+// @desc    Authenticate user / login
+// @route   POST /api/users/login
+// @access  Public
 export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
 
-  // Ensure you use the 'as string' cast here to satisfy TypeScript
   if (user && (await bcrypt.compare(password, user.password as string))) {
     res.status(200).json({
       _id: user._id,
@@ -66,10 +53,12 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/users/profile - Get user profile
+// @desc    Get user profile
+// @route   GET /api/users/profile
+// @access  Private
 export const getUserProfile = asyncHandler(async (req: Request, res: Response) => {
   // req.user is populated by your 'protect' middleware
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(req.user?._id);
 
   if (user) {
     res.status(200).json({
@@ -77,6 +66,28 @@ export const getUserProfile = asyncHandler(async (req: Request, res: Response) =
       name: user.name,
       email: user.email,
     });
+  } else {
+    throw new AppError('User not found', 404);
+  }
+});
+
+// @desc    Get all users
+// @route   GET /api/users
+// @access  Private/Admin
+export const getUsers = asyncHandler(async (req: Request, res: Response) => {
+  const users = await User.find({}).select('-password');
+  res.status(200).json(users);
+});
+
+// @desc    Delete user
+// @route   DELETE /api/users/:id
+// @access  Private/Admin
+export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
+  const user = await User.findById(req.params.id);
+
+  if (user) {
+    await user.deleteOne();
+    res.status(200).json({ message: 'User removed' });
   } else {
     throw new AppError('User not found', 404);
   }
